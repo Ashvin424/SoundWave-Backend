@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/soundwave_db
-    username: soundwave_user
-    password: Ashvin@123
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -11,16 +11,36 @@ spring:
       hibernate:
         format_sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      # Max size for a single file (default is 1MB)
+      max-file-size: 50MB
+      # Max size for the entire request (default is 10MB)
+      max-request-size: 50MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 jwt:
-  secret: yourSuperSecretKeyThatIsAtLeast32CharactersLong123
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 cloudinary:
-  cloud-name: dzb4ynmed
-  api-key: 249294259974273
-  api-secret: VmvcnJ7vf9yFdzDcAKGu1bFaLJ8
+  cloud-name: ${CLOUDINARY_NAME}
+  api-key: ${CLOUDINARY_KEY}
+  api-secret: ${CLOUDINARY_SECRET}
+
+
+
 

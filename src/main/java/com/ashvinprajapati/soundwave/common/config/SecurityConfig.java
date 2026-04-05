@@ -32,7 +32,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers(
+                                "/reset-password.html",  // static page
+                                "/api/auth/forgot-password",  // forgot endpoint
+                                "/api/auth/reset-password"    // reset endpoint
+                        ).permitAll()
+                        .requestMatchers("/api/auth/change-password").authenticated()
+                        .requestMatchers("/api/auth/update-profile").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/songs/upload").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

@@ -55,6 +55,9 @@ public class SongService {
                         .title(song.getTitle())
                         .artist(song.getArtist())
                         .audioUrl(song.getAudioUrl())
+                        .duration(song.getDuration())
+                        .genre(song.getGenre())
+                        .album(song.getAlbum())
                         .coverImageUrl(song.getCoverImageUrl())
                         .build())
                 .toList();

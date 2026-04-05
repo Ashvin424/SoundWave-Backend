@@ -1,6 +1,7 @@
 package com.ashvinprajapati.soundwave.playlist.service;
 
 import com.ashvinprajapati.soundwave.auth.entity.User;
+import com.ashvinprajapati.soundwave.playlist.dto.UpdatePlaylistRequest;
 import com.ashvinprajapati.soundwave.playlist.dto.PlaylistResponse;
 import com.ashvinprajapati.soundwave.playlist.entity.PlaylistEntity;
 import com.ashvinprajapati.soundwave.playlist.repository.PlaylistRepository;
@@ -50,7 +51,7 @@ public class PlaylistService {
             throw new RuntimeException("Not authorized to modify this playlist");
         }
 
-        if (playlist.getSongs().stream().anyMatch(song -> song.getId() == songId)) {
+        if (playlist.getSongs().stream().anyMatch(song -> song.getId().equals(songId))) {
             throw new RuntimeException("Song already in playlist");
         }
 
@@ -71,6 +72,31 @@ public class PlaylistService {
         }
 
         playlist.getSongs().removeIf(song -> song.getId() == songId);
+
+        return playlistRepository.save(playlist);
+    }
+
+    public void deletePlaylist(Long playlistId, User user) {
+        PlaylistEntity playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("Playlist Not Found"));
+
+        if (!playlist.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("Not authorized to delete this playlist");
+        }
+
+        playlistRepository.delete(playlist);
+    }
+
+    // edit playlist name
+    public PlaylistEntity editPlaylist(Long playlistId, String newPlaylistName, User user) {
+        PlaylistEntity playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("Playlist Not Found"));
+
+        if (!playlist.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("Not authorized to edit this playlist");
+        }
+
+        playlist.setName(newPlaylistName);
 
         return playlistRepository.save(playlist);
     }

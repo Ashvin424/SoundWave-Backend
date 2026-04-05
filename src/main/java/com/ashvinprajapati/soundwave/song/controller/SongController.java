@@ -1,12 +1,16 @@
 package com.ashvinprajapati.soundwave.song.controller;
 
+import com.ashvinprajapati.soundwave.auth.entity.User;
+import com.ashvinprajapati.soundwave.song.dto.SongResponse;
 import com.ashvinprajapati.soundwave.song.dto.SongsPageResponse;
 import com.ashvinprajapati.soundwave.song.entity.SongEntity;
+import com.ashvinprajapati.soundwave.song.service.RecentlyPlayedService;
 import com.ashvinprajapati.soundwave.song.service.SongService;
 import com.ashvinprajapati.soundwave.storage.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +23,7 @@ public class SongController {
 
     private final SongService songService;
     private final StorageService storageService;
+    private final RecentlyPlayedService recentlyPlayedService;
 
     @GetMapping
     public List<SongEntity> getAllSongs() {
@@ -48,6 +53,7 @@ public class SongController {
             @RequestParam(required = false) MultipartFile cover
     ) {
 
+
         // Upload audio file and get URL from storage service
         String audioUrl = storageService.uploadFile(audio, "songs");
 
@@ -68,5 +74,28 @@ public class SongController {
 
         SongEntity savedSong = songService.saveSong(song);
         return new ResponseEntity<>(savedSong, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/played")
+    public ResponseEntity<?> markAsPlayed(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
+    ) {
+        recentlyPlayedService.markAsPlayed(id, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/recently-played")
+    public ResponseEntity<List<SongResponse>> getRecentlyPlayed(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(recentlyPlayedService.getRecentlyPlayed(user));
+    }
+
+    @GetMapping("/played-count")
+    public ResponseEntity<Long> getPlayedCount(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(recentlyPlayedService.getPlayedCount(user));
     }
 }

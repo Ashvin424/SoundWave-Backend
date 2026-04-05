@@ -1,8 +1,6 @@
 package com.ashvinprajapati.soundwave.auth.service;
 
-import com.ashvinprajapati.soundwave.auth.dto.AuthResponse;
-import com.ashvinprajapati.soundwave.auth.dto.LoginRequest;
-import com.ashvinprajapati.soundwave.auth.dto.RegisterRequest;
+import com.ashvinprajapati.soundwave.auth.dto.*;
 import com.ashvinprajapati.soundwave.auth.entity.Role;
 import com.ashvinprajapati.soundwave.auth.entity.User;
 import com.ashvinprajapati.soundwave.auth.repository.UserRepository;
@@ -50,5 +48,26 @@ public class AuthService {
         String token = jwtService.generateToken(loginRequest.getEmail());
 
         return new AuthResponse(token);
+    }
+
+    public void changePassword(ChangePasswordRequest request, User user) {
+        if(!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public void updateProfile(UpdateProfileRequest request, User user) {
+
+        System.out.println("Updating profile for: " + user.getEmail());
+        System.out.println("New name: " + request.getFullName());
+
+        if (request.getFullName() == null || request.getFullName().isBlank()) {
+            throw new RuntimeException("Full name cannot be empty");
+        }
+        user.setFullName(request.getFullName());
+        userRepository.save(user);
     }
 }
